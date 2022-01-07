@@ -45,7 +45,6 @@ resource "azurerm_subnet" "sn" {
   ]
 }
 
-
 resource "azurerm_kubernetes_cluster" "k8s" {
   name                = var.cluster_name
   location            = azurerm_resource_group.k8s.location
@@ -81,3 +80,38 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     azurerm_subnet.sn,
   ]
 }
+
+resource "local_file" "kube-config" {
+  content  = azurerm_kubernetes_cluster.k8s.kube_config_raw
+  filename = "${path.cwd}/config"
+  depends_on = [
+    azurerm_kubernetes_cluster.k8s,
+  ]
+}
+
+module "namespaces" {
+  source      = "./modules/namespaces"
+  config_path = "${path.cwd}/config"
+  depends     = local_file.kube-config
+}
+
+module "istio" {
+  source      = "./modules/istio"
+  config_path = "${path.cwd}/config"
+  depends     = module.namespaces
+
+  # Istio controler and discovery variables
+  sidecar_request_cpu    = "100m"
+  sidecar_request_memory = "128Mi"
+  sidecar_limit_cpu      = "200m"
+  sidecar_limit_memory   = "256Mi"
+
+  # Istio ingress variables
+  ingressgateway_autoscale_min  = 1
+  ingressgateway_autoscale_max  = 3
+  ingressgateway_request_cpu    = "100m"
+  ingressgateway_request_memory = "128Mi"
+  ingressgateway_limit_cpu      = "1100m"
+  ingressgateway_limit_memory   = "1024Mi"
+}
+

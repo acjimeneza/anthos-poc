@@ -5,5 +5,5 @@ variable "config_path" {
 }
 
 variable "depends" {
-    description = "Dependency to create the namespaces"
+    description = "Dependency to create the monitor services"
 }
