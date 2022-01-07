@@ -111,7 +111,7 @@ module "istio" {
   ingressgateway_autoscale_max  = 3
   ingressgateway_request_cpu    = "100m"
   ingressgateway_request_memory = "128Mi"
-  ingressgateway_limit_cpu      = "1100m"
+  ingressgateway_limit_cpu      = "1200m"
   ingressgateway_limit_memory   = "1024Mi"
 }
 
