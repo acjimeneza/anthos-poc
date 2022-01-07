@@ -4,6 +4,10 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = ">= 1.7.0"
     }
+    curl = {
+      source  = "anschoewe/curl"
+      version = "0.1.3"
+    }
   }
 }
 
@@ -11,16 +15,25 @@ provider "kubectl" {
   config_path = var.config_path
 }
 
+
+locals {
+  yaml_prometheus = toset(compact(split("---", file("${path.cwd}/prometheus.yaml")), ))
+  yaml_grafana = toset(compact(split("---", file("${path.cwd}/grafana.yaml"))))
+}
+
 resource "kubectl_manifest" "yaml_prometheus" {
-  yaml_body = "https://raw.githubusercontent.com/istio/istio/release-1.12/samples/addons/prometheus.yaml"
+  for_each = local.yaml_prometheus
+  yaml_body = each.value
+
   depends_on = [
-    var.depends,
+    data.curl.get_yaml_grafana,
   ]
 }
 
-
 resource "kubectl_manifest" "yaml_grafana" {
-  yaml_body = "https://raw.githubusercontent.com/istio/istio/release-1.12/samples/addons/grafana.yaml"
+  for_each = local.yaml_grafana
+  yaml_body = each.value
+
   depends_on = [
     kubectl_manifest.yaml_prometheus,
   ]

@@ -115,3 +115,8 @@ module "istio" {
   ingressgateway_limit_memory   = "1024Mi"
 }
 
+module "metrics" {
+  source      = "./modules/metrics"
+  config_path = "${path.cwd}/config"
+  depends     = module.istio
+}
