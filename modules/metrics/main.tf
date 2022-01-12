@@ -26,7 +26,7 @@ resource "kubectl_manifest" "yaml_prometheus" {
   yaml_body = each.value
 
   depends_on = [
-    data.curl.get_yaml_grafana,
+    var.depends,
   ]
 }
 
