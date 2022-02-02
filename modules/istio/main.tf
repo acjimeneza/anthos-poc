@@ -73,6 +73,9 @@ resource "helm_release" "istio_ingress" {
   # Resources for istio ingress
   values = [
     <<EOT
+labels:
+  app: istio-ingressgateway
+  istio: ingressgateway
 resources:
   requests:
     cpu: ${var.ingressgateway_request_cpu}
