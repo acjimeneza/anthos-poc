@@ -28,6 +28,9 @@ resource "kubernetes_namespace" "test-services" {
     }
     name = "test-services"
   }
+  depends_on = [
+    kubernetes_namespace.istio-system,
+  ]
 }
 
 resource "kubernetes_namespace" "istio-ingress" {
@@ -37,4 +40,7 @@ resource "kubernetes_namespace" "istio-ingress" {
     }
     name = "istio-ingress"
   }
+  depends_on = [
+    kubernetes_namespace.test-services,
+  ]
 }
